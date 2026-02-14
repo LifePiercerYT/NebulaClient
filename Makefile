@@ -39,7 +39,7 @@ LDFLAGS     := $(WUT_LDFLAGS)
 all: $(TARGET).wps
 
 $(TARGET).wps: $(TARGET).rpx
-  @echo "Packaging into WPS..."
+	@echo "Packaging into WPS..."
   @$(DEVKITPRO)/tools/bin/wups-tool --create $@ --rpx $< --name "$(NAME)" --author "$(AUTHOR)" --description "$(VERSION)"
 
 $(TARGET).rpx: $(SOURCES)/main.cpp
