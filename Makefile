@@ -1,17 +1,16 @@
-# Project Settings
+.RECIPEPREFIX = >
+
 TARGET      := NebulaClient
 SOURCES     := .
-INCLUDES    := include
+# CHANGED: Look in root (.) for headers
+INCLUDES    := .
 
-# Check for devkitPro
 ifeq ($(strip $(DEVKITPRO)),)
 $(error "Please set DEVKITPRO in your environment.")
 endif
 
-# Include WUT rules for Wii U
 include $(DEVKITPRO)/wut/share/wut.mk
 
-# Compiler Flags
 CFLAGS      += -O2 -Wall -fms-extensions
 CXXFLAGS    += $(CFLAGS)
 LIBS        := -lwups -lwut
@@ -20,15 +19,13 @@ LIBS        := -lwups -lwut
 
 all: $(TARGET).wps
 
-# Aroma plugins are RPX files renamed to .wps
 $(TARGET).wps: $(TARGET).rpx
-	@echo "Creating Aroma Plugin: $@"
-	@cp $(TARGET).rpx $(TARGET).wps
+>@echo "Creating Aroma Plugin: $@"
+>@cp $(TARGET).rpx $(TARGET).wps
 
-# Compile all .cpp files found in the root directory
 $(TARGET).rpx:
-	@$(CXX) $(CXXFLAGS) -I$(INCLUDES) $(LDFLAGS) *.cpp -o $@ $(LIBS)
+>@$(CXX) $(CXXFLAGS) -I$(INCLUDES) $(LDFLAGS) *.cpp -o $@ $(LIBS)
 
 clean:
-	@echo "Cleaning project..."
-	@rm -f *.wps *.rpx *.elf
+>@echo "Cleaning project..."
+>@rm -f *.wps *.rpx *.elf
