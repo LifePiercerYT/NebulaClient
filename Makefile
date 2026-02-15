@@ -1,9 +1,9 @@
-# Use a '>' instead of a TAB for iPhone editing
 .RECIPEPREFIX = >
 
 TARGET      := NebulaClient
-SOURCES     := src
-INCLUDES    := include
+# This tells the compiler to look in BOTH the root and src/include folders
+SOURCES     := . src
+INCLUDES    := . include
 
 ifeq ($(strip $(DEVKITPRO)),)
 $(error "Please set DEVKITPRO in your environment.")
@@ -11,7 +11,6 @@ endif
 
 include $(DEVKITPRO)/wut/share/wut.mk
 
-# Compiler Flags
 CFLAGS      += -O2 -Wall -fms-extensions
 CXXFLAGS    += $(CFLAGS)
 LIBS        := -lwups -lwut
@@ -24,9 +23,9 @@ $(TARGET).wps: $(TARGET).rpx
 >@echo "Creating Aroma Plugin: $@"
 >@cp $(TARGET).rpx $(TARGET).wps
 
-# Compile all .cpp files from the src folder
 $(TARGET).rpx:
->@$(CXX) $(CXXFLAGS) -I$(INCLUDES) $(LDFLAGS) $(SOURCES)/*.cpp -o $@ $(LIBS)
+# This searches for any .cpp file in the root OR src folder
+>@$(CXX) $(CXXFLAGS) -I. -Iinclude $(LDFLAGS) *.cpp src/*.cpp -o $@ $(LIBS) 2>/dev/null || $(CXX) $(CXXFLAGS) -I. -Iinclude $(LDFLAGS) *.cpp -o $@ $(LIBS)
 
 clean:
 >@echo "Cleaning project..."
