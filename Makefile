@@ -1,8 +1,6 @@
-#---------------------------------------------------------------------------------
 # Project Settings
-#---------------------------------------------------------------------------------
-TARGET      := $(notdir $(CURDIR))
-SOURCES     := src
+TARGET      := NebulaClient
+SOURCES     := .
 INCLUDES    := include
 
 # Check for devkitPro
@@ -13,18 +11,11 @@ endif
 # Include WUT rules for Wii U
 include $(DEVKITPRO)/wut/share/wut.mk
 
-#---------------------------------------------------------------------------------
-# Compiler and Linker Flags
-#---------------------------------------------------------------------------------
+# Compiler Flags
 CFLAGS      += -O2 -Wall -fms-extensions
 CXXFLAGS    += $(CFLAGS)
-
-# Link against WUPS (Aroma Plugin System) and WUT
 LIBS        := -lwups -lwut
 
-#---------------------------------------------------------------------------------
-# Build Rules
-#---------------------------------------------------------------------------------
 .PHONY: all clean
 
 all: $(TARGET).wps
@@ -34,9 +25,9 @@ $(TARGET).wps: $(TARGET).rpx
 	@echo "Creating Aroma Plugin: $@"
 	@cp $(TARGET).rpx $(TARGET).wps
 
-# Compile all .cpp files in the src folder
+# Compile all .cpp files found in the root directory
 $(TARGET).rpx:
-	@$(CXX) $(CXXFLAGS) -I$(INCLUDES) $(LDFLAGS) $(SOURCES)/*.cpp -o $@ $(LIBS)
+	@$(CXX) $(CXXFLAGS) -I$(INCLUDES) $(LDFLAGS) *.cpp -o $@ $(LIBS)
 
 clean:
 	@echo "Cleaning project..."
