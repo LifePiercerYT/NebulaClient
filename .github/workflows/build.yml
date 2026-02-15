@@ -9,17 +9,20 @@ jobs:
   build:
     runs-on: ubuntu-latest
     container: ghcr.io/wiiu-env/wiiupluginsystem:latest
+    # This block injects the paths into the container globally
+    env:
+      DEVKITPRO: /opt/devkitpro
+      DEVKITPPC: /opt/devkitpro/devkitPPC
+      WUT_ROOT: /opt/devkitpro/wut
+      PATH: /opt/devkitpro/devkitPPC/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: Build Plugin
-        # We manually set the PATH to the devkitPPC tools inside the container
+        # Now 'make' will be able to find 'powerpc-eabi-g++'
         run: |
-          export DEVKITPRO=/opt/devkitpro
-          export DEVKITPPC=$DEVKITPRO/devkitPPC
-          export PATH=$DEVKITPPC/bin:$PATH
           make clean
           make
         shell: bash
