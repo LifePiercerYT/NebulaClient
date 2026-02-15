@@ -1,0 +1,15 @@
+name: Build Wii U Plugin
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: ghcr.io/wiiu-env/wiiupluginsystem:latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build
+        run: make
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: my-plugin
+          path: "*.wps"
