@@ -9,21 +9,20 @@ jobs:
   build:
     runs-on: ubuntu-latest
     container: ghcr.io/wiiu-env/wiiupluginsystem:latest
+    # Define paths globally for this job
+    env:
+      DEVKITPRO: /opt/devkitpro
+      DEVKITPPC: /opt/devkitpro/devkitPPC
+      PATH: /opt/devkitpro/devkitPPC/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: Build Plugin
-        # We manually export the PATH right before running make
-        run: |
-          export DEVKITPRO=/opt/devkitpro
-          export DEVKITPPC=$DEVKITPRO/devkitPPC
-          export PATH=$DEVKITPPC/bin:$PATH
-          make clean
-          make
-        shell: bash
-
+        # Simply run make; the env block above handles the paths
+        run: make
+        
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
