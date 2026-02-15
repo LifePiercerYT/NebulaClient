@@ -1,6 +1,8 @@
+#---------------------------------------------------------------------------------
 # Project Settings
+#---------------------------------------------------------------------------------
 TARGET      := $(notdir $(CURDIR))
-SOURCES     := .
+SOURCES     := src
 INCLUDES    := include
 
 # Check for devkitPro
@@ -11,23 +13,30 @@ endif
 # Include WUT rules for Wii U
 include $(DEVKITPRO)/wut/share/wut.mk
 
-# Compiler Flags for C++
-CXXFLAGS    += -O2 -Wall -fms-extensions
-# Required for Aroma plugins
+#---------------------------------------------------------------------------------
+# Compiler and Linker Flags
+#---------------------------------------------------------------------------------
+CFLAGS      += -O2 -Wall -fms-extensions
+CXXFLAGS    += $(CFLAGS)
+
+# Link against WUPS (Aroma Plugin System) and WUT
 LIBS        := -lwups -lwut
 
+#---------------------------------------------------------------------------------
+# Build Rules
+#---------------------------------------------------------------------------------
 .PHONY: all clean
 
 all: $(TARGET).wps
 
-# Aroma plugins are RPX files renamed to WPS
+# Aroma plugins are RPX files renamed to .wps
 $(TARGET).wps: $(TARGET).rpx
-	@echo "Creating Aroma plugin: $@"
+	@echo "Creating Aroma Plugin: $@"
 	@cp $(TARGET).rpx $(TARGET).wps
 
-# Compile all .cpp files in the root folder
+# Compile all .cpp files in the src folder
 $(TARGET).rpx:
-	@$(CXX) $(CXXFLAGS) $(LDFLAGS) *.cpp -o $@ $(LIBS)
+	@$(CXX) $(CXXFLAGS) -I$(INCLUDES) $(LDFLAGS) $(SOURCES)/*.cpp -o $@ $(LIBS)
 
 clean:
 	@echo "Cleaning project..."
