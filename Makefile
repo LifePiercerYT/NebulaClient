@@ -1,9 +1,11 @@
 .RECIPEPREFIX = >
 
 TARGET      := NebulaClient
-# This tells the compiler to look in BOTH the root and src/include folders
-SOURCES     := . src
-INCLUDES    := . include
+
+# Find all .cpp files in root or any subfolder (like src/)
+CPPS        := $(shell find . -name "*.cpp")
+# Include both root and the include folder for headers
+INCLUDES    := -I. -Iinclude
 
 ifeq ($(strip $(DEVKITPRO)),)
 $(error "Please set DEVKITPRO in your environment.")
@@ -24,8 +26,7 @@ $(TARGET).wps: $(TARGET).rpx
 >@cp $(TARGET).rpx $(TARGET).wps
 
 $(TARGET).rpx:
-# This searches for any .cpp file in the root OR src folder
->@$(CXX) $(CXXFLAGS) -I. -Iinclude $(LDFLAGS) *.cpp src/*.cpp -o $@ $(LIBS) 2>/dev/null || $(CXX) $(CXXFLAGS) -I. -Iinclude $(LDFLAGS) *.cpp -o $@ $(LIBS)
+>@$(CXX) $(CXXFLAGS) $(INCLUDES) $(LDFLAGS) $(CPPS) -o $@ $(LIBS)
 
 clean:
 >@echo "Cleaning project..."
