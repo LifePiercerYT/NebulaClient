@@ -1,15 +1,33 @@
-name: Build Wii U Plugin
-on: [push]
+name: Wii U Plugin Build
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
 jobs:
   build:
     runs-on: ubuntu-latest
+    # This container has the Wii U toolchain pre-installed
     container: ghcr.io/wiiu-env/wiiupluginsystem:latest
+
     steps:
-      - uses: actions/checkout@v3
-      - name: Build
-        run: make
+      # CRITICAL: This pulls your code (and Makefile) into the runner
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # Runs the build command using your Makefile
+      - name: Build Plugin
+        run: |
+          make clean
+          make
+
+      # Uploads the finished .wps file so you can download it
       - name: Upload Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: my-plugin
+          name: nebula-client-plugin
           path: "*.wps"
+          if-no-files-found: error
