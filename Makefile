@@ -1,51 +1,37 @@
-#---------------------------------------------------------------------------------
-# Project Metadata
-#---------------------------------------------------------------------------------
-TARGET      := NebulaClient
-NAME      := NebulaClient
-AUTHOR      := LifePiercer
-DESCRIPTION := LifePiercer
-VERSION     := 1.0.0
+# Project Settings
+TARGET      := $(notdir $(CURDIR))
+SOURCES     := src
+INCLUDES    := include
 
-#---------------------------------------------------------------------------------
-# Path Setup (Assuming devkitPro is installed)
-#---------------------------------------------------------------------------------
+# Check for devkitPro
 ifeq ($(strip $(DEVKITPRO)),)
-$(error "Please set DEVKITPRO in your environment. export DEVKITPRO=/opt/devkitpro")
+$(error "Please set DEVKITPRO in your environment.")
 endif
 
-include $(DEVKITPRO)/wut/ahare/wut.mk
+# Include WUT rules
+include $(DEVKITPRO)/wut/share/wut.mk
 
-#---------------------------------------------------------------------------------
-# Build Directories
-#---------------------------------------------------------------------------------
-BUILD    := build
-SOURCES    := src
-INCLUDES := include
+# Compiler Flags
+# WUPS requires specific defines for plugin information
+CFLAGS      += -O2 -Wall -fms-extensions
+CXXFLAGS    += $(CFLAGS)
 
-#---------------------------------------------------------------------------------
-# Libraries & Flags
-#---------------------------------------------------------------------------------
-LIBS    := -lwups -lwut -lvpad
-CXXFLAGS := $(WUT_CXXFLAGS) -02 -Wall -fno-strict-aliasing
-CFLAGS      := $(WUT_CFLAGS) -02 -Wall
-LDFLAGS     := $(WUT_LDFLAGS)
+# Libraries: lwups is required for Aroma plugins
+LIBS        := -lwups -lwut
 
-#---------------------------------------------------------------------------------
 # Build Rules
-#---------------------------------------------------------------------------------
 .PHONY: all clean
 
 all: $(TARGET).wps
 
+# Aroma plugins are essentially RPX files renamed to WPS
 $(TARGET).wps: $(TARGET).rpx
-	@echo "Packaging into WPS..."
-  @$(DEVKITPRO)/tools/bin/wups-tool --create $@ --rpx $< --name "$(NAME)" --author "$(AUTHOR)" --description "$(VERSION)"
+	@echo "Converting RPX to WPS..."
+	@cp $(TARGET).rpx $(TARGET).wps
 
-$(TARGET).rpx: $(SOURCES)/main.cpp
-  @mkdir -p $(BUILD)
-  powerpc-eabi-g++ $(CXXFLAGS) -I$(INCLUDES) $(SOURCES)/main.cpp $(LDFLAGS) $(LIBS) -o $@
+$(TARGET).rpx: $(SOURCES)
+	@$(CXX) $(CXXFLAGS) $(LDFLAGS) $(SOURCES)/*.c -o $@ $(LIBS)
 
 clean:
-  @rm -rf $(BUILD) $(TARGET).rpx $(TARGET).wps
-  @echo "Cleaned up build files."
+	@echo "Cleaning project..."
+	@rm -f *.wps *.rpx *.elf
