@@ -1,8 +1,12 @@
-#include <wups.hpp>
+#include <wups.h>
 #include <vpad/input.h>
-#include <string.h>
+#include <stdint.h>
 
-// External variables shared with main.cpp
+/**
+ * EXTERNAL VARIABLES
+ * These are defined in main.cpp. Using 'extern' tells this file
+ * to look for them in the other compiled file.
+ */
 extern float hitboxSize;
 extern float aimStrength;
 extern bool isMenuOpen;
@@ -10,33 +14,31 @@ extern int selectedOption;
 
 /**
  * Handle Menu Navigation
- * Logic for moving the "cursor" and sliding values
+ * This function is called by the VPAD Hook in main.cpp
  */
 void handleMenuNavigation(uint32_t trigger, uint32_t hold) {
-    // Navigate between Hitbox (0) and Aim Assist (1)
+    // 1. Navigate between Options (DPAD UP/DOWN)
     if (trigger & VPAD_BUTTON_DOWN) {
-        selectedOption = 1;
+        selectedOption = 1; // Aim Assist
     } else if (trigger & VPAD_BUTTON_UP) {
-        selectedOption = 0;
+        selectedOption = 0; // Hitbox
     }
 
-    // Slider Logic: Right increases, Left decreases
+    // 2. Slider Logic (DPAD LEFT/RIGHT)
     if (selectedOption == 0) { // Hitbox Selection
-        if (hold & VPAD_BUTTON_RIGHT) hitboxSize += 0.05f;
-        if (hold & VPAD_BUTTON_LEFT && hitboxSize > 0.1f) hitboxSize -= 0.05f;
+        if (hold & VPAD_BUTTON_RIGHT) {
+            hitboxSize += 0.01f;
+        }
+        if ((hold & VPAD_BUTTON_LEFT) && hitboxSize > 0.1f) {
+            hitboxSize -= 0.01f;
+        }
     } 
     else if (selectedOption == 1) { // Aim Assist Selection
-        if (hold & VPAD_BUTTON_RIGHT && aimStrength < 1.0f) aimStrength += 0.02f;
-        if (hold & VPAD_BUTTON_LEFT && aimStrength > 0.0f) aimStrength -= 0.02f;
+        if ((hold & VPAD_BUTTON_RIGHT) && aimStrength < 1.0f) {
+            aimStrength += 0.01f;
+        }
+        if ((hold & VPAD_BUTTON_LEFT) && aimStrength > 0.0f) {
+            aimStrength -= 0.01f;
+        }
     }
-}
-
-/**
- * Rendering Note:
- * In a .wps plugin, UI is typically rendered using the WUPS Config API
- * which creates a native Wii U sub-menu.
- */
-void renderMenuStatus() {
-    // This is where you would call OSScreen or WUPS Config functions
-    // to display: "Hitbox Size: [|||||---] 1.5x"
 }
